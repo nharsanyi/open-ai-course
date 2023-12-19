@@ -31,7 +31,7 @@ def get_colours(msg):
         Q: Convert the following verbal description of a colour palette into a list of colours: {msg}
         A:
     """
-    response = openai.Completion.create(
+    response = openai.ChatCompletion.create(
         model="text-davinci-003",
         prompt=prompt,
         max_tokens=200
@@ -40,12 +40,32 @@ def get_colours(msg):
     return json.loads(colours)
 
 
+def get_colours_with_chat_api(msg):
+    messages = [
+        {"role": "system", "content": "You are a colour palette generating assistant that responds to text prompts for colour palettes."},
+        {"role": "user", "content": "Convert the following verbal description of a colour palette into a list of colours"},
+        {"role": "assistant", "content": '["#006699", "#66CCCC", "#F0E68C", "#008000", "#F08080"]'},
+        {"role": "user", "content": "Convert the following verbal description of a colour palette into a list of colours: sage, nature, earth"},
+        {"role": "assistant", "content": '["#EDF1D6", "#9DC08B", "#609966", "#40513B"]'},
+        {"role": "user", "content": f"Convert the following verbal description of a colour palette into a list of colours: {msg}"}
+
+    ]
+
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+        max_tokens=200
+    )
+    colours = response["choices"][0]["message"]["content"]
+    return json.loads(colours)
+
 @app.route("/palette", methods=["POST"])
 def prompt_to_palette():
     app.logger.info("Hit the post request route")
     query = request.form.get("query")
     app.logger.info(query)
-    colours = get_colours(query)
+    # colours = get_colours(query)
+    colours = get_colours_with_chat_api(query)
 
     return {"colours": colours}
 
