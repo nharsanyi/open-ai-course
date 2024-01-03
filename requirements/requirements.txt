@@ -2,3 +2,7 @@ Flask
 openai
 python_dotenv
 tiktoken
+spotipy
+tenacity
+openai[embeddings]
+numpy
