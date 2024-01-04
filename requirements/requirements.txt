@@ -6,3 +6,5 @@ spotipy
 tenacity
 openai[embeddings]
 numpy
+scikit-learn
+matplotlib
