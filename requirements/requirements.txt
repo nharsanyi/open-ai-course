@@ -8,3 +8,4 @@ openai[embeddings]
 numpy
 scikit-learn
 matplotlib
+seaborn
