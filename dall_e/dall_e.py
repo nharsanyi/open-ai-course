@@ -5,6 +5,7 @@ import json
 import requests
 from pathlib import Path
 import base64
+from utils import image_utils
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 image_directory_name = "images"
@@ -23,16 +24,16 @@ def main():
 
     img = generate_image(query, response_format)
     if response_format == "url":
-        download_image(img)
+        image_utils.download_image(img, local_path=f"{image_directory_name}/astronaut.png")
     else:
-        save_image_content(img, response_format)
+        image_utils.save_image_content(img, response_format)
 
     variation_url = create_img_variation(f"{image_directory_name}/astronaut.png")
-    download_image(variation_url, f"{image_directory_name}/astronaut_variation.png")
+    image_utils.download_image(variation_url, f"{image_directory_name}/astronaut_variation.png")
     edit_url = create_img_edit(img_path=f"{image_directory_name}/great_wave.png",
                                mask_path=f"{image_directory_name}/great_wave_mask.png",
                                prompt="A pink flamingo floaty")
-    download_image(edit_url, f"{image_directory_name}/great_wave_edit.png")
+    image_utils.download_image(edit_url, f"{image_directory_name}/great_wave_edit.png")
 
 
 def create_img_edit(img_path, mask_path, prompt):
@@ -63,20 +64,6 @@ def generate_image(prompt: str, response_format="url"):
         response_format=response_format  # or b64_json
     )
     return res["data"][0][response_format]
-
-
-def download_image(image_url, local_path=f"{image_directory_name}/astronaut.png"):
-    image_content = requests.get(image_url).content
-    save_image_content(image_content, "url", local_path)
-
-
-def save_image_content(image_content, image_format, local_path):
-    with open(local_path, "wb") as f:
-        if image_format == "b64_json":
-            decoded_image = base64.b64decode(image_content)
-            f.write(decoded_image)
-        else:
-            f.write(image_content)
 
 
 if __name__ == "__main__":
